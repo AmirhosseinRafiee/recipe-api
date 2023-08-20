@@ -2,7 +2,7 @@
 Views for the user API.
 """
 from rest_framework.views import Response, APIView
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework.permissions import IsAuthenticated
@@ -31,3 +31,13 @@ class DiscardTokenAPIView(APIView):
     def post(self, request):
         self.request.auth.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ManageUserAPIView(RetrieveUpdateAPIView):
+    """Manage the authenticated user."""
+    serializer_class = UserSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

@@ -14,4 +14,5 @@ urlpatterns = [
     path('token/discard/',
          views.DiscardTokenAPIView.as_view(),
          name='token-discard'),
+    path('me/', views.ManageUserAPIView.as_view(), name='me'),
 ]
