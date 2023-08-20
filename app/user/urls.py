@@ -7,5 +7,11 @@ from . import views
 app_name = 'user'
 
 urlpatterns = [
-    path('create/', views.CreateUserAPIView.as_view(), name='create')
+    path('create/', views.CreateUserAPIView.as_view(), name='create'),
+    path('token/create/',
+         views.CreateTokenAPIView.as_view(),
+         name='token-create'),
+    path('token/discard/',
+         views.DiscardTokenAPIView.as_view(),
+         name='token-discard'),
 ]
