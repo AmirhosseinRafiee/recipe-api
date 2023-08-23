@@ -1,21 +1,23 @@
 """
 Tests for models.
 """
+from decimal import Decimal
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from .. import models
+
+
+User = get_user_model()
 
 
 class ModelTests(TestCase):
     """Test models."""
 
-    def setUp(self):
-        self.User = get_user_model()
-
     def test_create_user_with_email_successful(self):
         """Test creating a user with an email is successful."""
         email = 'test@example.com'
         password = 'testpass1234'
-        user = self.User.objects.create_user(
+        user = User.objects.create_user(
             email=email,
             password=password
         )
@@ -32,20 +34,36 @@ class ModelTests(TestCase):
             ['test4@example.COM', 'test4@example.com']
         ]
         for email, expected in sample_emails:
-            user = self.User.objects.create_user(email, 'sample1234')
+            user = User.objects.create_user(email, 'sample1234')
             self.assertEqual(user.email, expected)
 
     def test_new_user_without_email_raises_error(self):
         """Test that creating a user without an email raises a ValueError"""
         with self.assertRaises(ValueError):
-            self.User.objects.create_user('', 'sample1234')
+            User.objects.create_user('', 'sample1234')
 
     def test_create_superuser(self):
         """Test creating a superuser"""
-        user = self.User.objects.create_superuser(
+        user = User.objects.create_superuser(
             'test@example.com',
             'sample1234'
         )
 
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+
+    def test_create_recipe(self):
+        """Test creating a recipe is successful."""
+        user = User.objects.create_user(
+            'test@example.com',
+            'testpass1234'
+        )
+        recipe = models.Recipe.objects.create(
+            user=user,
+            title='Sample recipe name',
+            time_minutes=5,
+            price=Decimal('5.50'),
+            description='Sample recipe description.'
+        )
+
+        self.assertEqual(str(recipe), recipe.title)
