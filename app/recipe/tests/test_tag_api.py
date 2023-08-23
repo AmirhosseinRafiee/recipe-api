@@ -12,6 +12,7 @@ from ..serializers import TagSerializer
 TAGS_URL = reverse('recipe:tag-list')
 User = get_user_model()
 
+
 class PublicTagAPITest(TestCase):
     """Test the publicly available tags API."""
 
@@ -23,6 +24,7 @@ class PublicTagAPITest(TestCase):
         res = self.client.get(TAGS_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class PrivateTagAPITest(TestCase):
     """Test the authorized user tags API."""

@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from core.models import Tag
 from .serializers import TagSerializer
 
+
 class TagViewSet(viewsets.GenericViewSet,
                  mixins.ListModelMixin,
                  mixins.CreateModelMixin):
