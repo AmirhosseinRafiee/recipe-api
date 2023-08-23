@@ -10,6 +10,11 @@ from .. import models
 User = get_user_model()
 
 
+def sample_user(email='sample@example.com', password='testpass1234'):
+    """create a sample user."""
+    return User.objects.create_user(email=email, password=password)
+
+
 class ModelTests(TestCase):
     """Test models."""
 
@@ -67,3 +72,12 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(recipe), recipe.title)
+
+    def test_teg_str(self):
+        """Test the tag string representation."""
+        tag = models.Tag.objects.create(
+            user=sample_user(),
+            name='Test tag name',
+        )
+
+        self.assertEqual(str(tag), tag.name)
