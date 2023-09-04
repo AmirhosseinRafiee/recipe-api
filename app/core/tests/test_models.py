@@ -10,7 +10,7 @@ from .. import models
 User = get_user_model()
 
 
-def sample_user(email='sample@example.com', password='testpass1234'):
+def create_user(email='sample@example.com', password='testpass1234'):
     """create a sample user."""
     return User.objects.create_user(email=email, password=password)
 
@@ -73,10 +73,10 @@ class ModelTests(TestCase):
 
         self.assertEqual(str(recipe), recipe.title)
 
-    def test_teg_str(self):
-        """Test the tag string representation."""
+    def test_create_tag(self):
+        """Test creating a tag is successful."""
         tag = models.Tag.objects.create(
-            user=sample_user(),
+            user=create_user(),
             name='Test tag name',
         )
 
@@ -85,7 +85,7 @@ class ModelTests(TestCase):
     def test_ingredient_str(self):
         """Test the ingredient string representation."""
         ingredient = models.Ingredient.objects.create(
-            user=sample_user(),
+            user=create_user(),
             name='Cucumber'
         )
 
