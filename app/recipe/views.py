@@ -14,7 +14,8 @@ from .serializers import (
 
 
 class BaseRecipeAttrViewSet(mixins.ListModelMixin,
-                            mixins.CreateModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.DestroyModelMixin,
                             viewsets.GenericViewSet):
     """Base viewset for user owned recipe attributes."""
     authentication_classes = (TokenAuthentication,)
@@ -51,9 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagViewSet(mixins.DestroyModelMixin,
-                 mixins.UpdateModelMixin,
-                 BaseRecipeAttrViewSet):
+class TagViewSet(BaseRecipeAttrViewSet):
     """Manage tags."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer

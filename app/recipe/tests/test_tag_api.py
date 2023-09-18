@@ -91,26 +91,3 @@ class PrivateTagAPITest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Tag.objects.filter(user=self.user).exists())
-
-    def test_create_tag_success(self):
-        """Test creating a new tag."""
-        payload = {
-            'name': 'Vegan'
-        }
-        res = self.client.post(TAGS_URL, data=payload)
-
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-        exists = Tag.objects.filter(
-            user=self.user,
-            name=payload['name']
-        ).exists()
-        self.assertTrue(exists)
-
-    def test_create_tag_blank(self):
-        """Test creating a new tag with blank name."""
-        payload = {
-            'name': ''
-        }
-        res = self.client.post(TAGS_URL, data=payload)
-
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)

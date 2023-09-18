@@ -13,14 +13,24 @@ INGREDIENTS_URL = reverse('recipe:ingredient-list')
 User = get_user_model()
 
 
+def get_detail_url(ingredient_pk):
+    """create and return an ingredient detail URL."""
+    return reverse('recipe:ingredient-detail', args=(ingredient_pk,))
+
+
+def create_user(email='test@example.com', password='testpass1234'):
+    """Create and return user."""
+    return User.objects.create_user(email=email, password=password)
+
+
 class PublicIngredientAPITest(TestCase):
-    """Test publicly available ingredients API."""
+    """Test unauthenticated API requests."""
 
     def setUp(self):
         self.client = APIClient()
 
-    def test_login_required(self):
-        """Test that login required for retrieving ingredients."""
+    def test_auth_required(self):
+        """Test auth is required for retrieving ingredients."""
         res = self.client.get(INGREDIENTS_URL)
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -30,10 +40,7 @@ class PrivateIngredientAPITest(TestCase):
     """Test the authorized user ingredient API."""
 
     def setUp(self):
-        self.user = User.objects.create_user(
-            'test@example.com',
-            'testpass1234'
-        )
+        self.user = create_user()
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
@@ -51,7 +58,7 @@ class PrivateIngredientAPITest(TestCase):
 
     def test_ingredient_limited_for_user(self):
         """Test that retrieving ingredients for authenticated user."""
-        user2 = User.objects.create_user('other@example.com', 'testpass1234')
+        user2 = create_user(email='other@example.com')
         Ingredient.objects.create(user=user2, name='Vinegar')
         ingredient = Ingredient.objects.create(user=self.user, name='Tumeric')
 
@@ -60,21 +67,29 @@ class PrivateIngredientAPITest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], ingredient.name)
+        self.assertEqual(res.data[0]['id'], ingredient.id)
 
-    def test_create_ingredient_success(self):
-        """Test creating a new ingredient."""
+    def test_update_ingredient(self):
+        """Test updating an ingredient."""
+        ingredient = Ingredient.objects.create(user=self.user, name='Cilantro')
+
         payload = {
-            'name': 'Cabbage'
+            'name': 'Coriander'
         }
-        res = self.client.post(INGREDIENTS_URL, data=payload)
+        url = get_detail_url(ingredient.pk)
+        res = self.client.patch(url, data=payload)
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        ingredient.refresh_from_db()
+        self.assertEqual(ingredient.name, payload['name'])
 
-    def test_create_ingredient_blank(self):
-        """Test creating blank ingredient fails."""
-        payload = {
-            'name': ''
-        }
-        res = self.client.post(INGREDIENTS_URL, data=payload)
+    def test_delete_ingredient(self):
+        """Test deleting an ingredient."""
+        ingredient = Ingredient.objects.create(user=self.user, name='Lettuce')
 
-        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        url = get_detail_url(ingredient.pk)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        ingredients = Ingredient.objects.filter(user=self.user)
+        self.assertFalse(ingredients.exists())
