@@ -1,8 +1,17 @@
+import uuid
+import os
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
+
+
+def generate_recipe_image_file_name(instance, filename):
+    """Generate file path for new recipe image."""
+    ext = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+    return os.path.join('uploads', 'recipe', filename)
 
 
 class UserManager(BaseUserManager):
@@ -88,6 +97,8 @@ class Recipe(models.Model):
     link = models.CharField(max_length=255, blank=True)
     tags = models.ManyToManyField(Tag)
     ingredients = models.ManyToManyField(Ingredient)
+    image = models.ImageField(null=True,
+                              upload_to=generate_recipe_image_file_name)
 
     def __str__(self):
         return self.title
