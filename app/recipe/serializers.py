@@ -88,6 +88,7 @@ class RecipeDetailSerializer(RecipeSerializer):
 
     class Meta(RecipeSerializer.Meta):
         fields = RecipeSerializer.Meta.fields + ('description', 'image')
+        read_only_fields = ('image', )
 
 
 class RecipeImagesSerializer(serializers.ModelSerializer):

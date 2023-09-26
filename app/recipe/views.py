@@ -7,7 +7,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.serializers import ModelSerializer
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
 from core.models import Recipe, Tag, Ingredient
+from .filters import RecipeFilter, TagFilter, IngredientFilter
 from .serializers import (
     RecipeSerializer,
     RecipeDetailSerializer,
@@ -24,6 +26,7 @@ class BaseRecipeAttrViewSet(mixins.ListModelMixin,
     """Base viewset for user owned recipe attributes."""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+    filter_backends = (DjangoFilterBackend,)
 
     def get_queryset(self):
         """Return objects for the current user authenticated."""
@@ -40,6 +43,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
     authentication_classes = (TokenAuthentication, )
     permission_classes = (IsAuthenticated, )
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = RecipeFilter
 
     def get_queryset(self):
         """Return objects for authenticated user."""
@@ -77,9 +82,11 @@ class TagViewSet(BaseRecipeAttrViewSet):
     """Manage tags."""
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    filterset_class = TagFilter
 
 
 class IngredientViewSet(BaseRecipeAttrViewSet):
     """Manage ingredients."""
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    filterset_class = IngredientFilter
